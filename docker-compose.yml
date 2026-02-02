@@ -2,8 +2,8 @@ services:
   academycheckinapi-pg:
     image: bitnami/postgresql
     environment:
-      POSTGRES_USER: docker
-      POSTGRES_PASSWORD: docker
-      POSTGRES_DB: academycheckinapidb
+      POSTGRESQL_USERNAME: docker
+      POSTGRESQL_PASSWORD: docker
+      POSTGRESQL_DATABASE: academycheckinapidb
     ports:
       - "5432:5432"

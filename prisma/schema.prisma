@@ -13,7 +13,7 @@ datasource db {
   provider = "postgresql"
   // Connection URLs are no longer supported in schema files.
   // Move your database connection configuration to prisma.config.ts as described here:
-  // https://pris.ly/d/config-datasource
+  //https://pris.ly/d/config-datasource
 }
 
 model User {

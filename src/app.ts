@@ -1,13 +1,20 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import routes from './routes';
+import { errorHandler } from './shared/middlewares/errorHandler';
+import { requestLogger, errorLogger } from './shared/middlewares/logger';
 
 export const app = express();
 
-const prisma = new PrismaClient();
+app.use(express.json());
 
-prisma.user.create({
-  data: {
-    name: 'Aender',
-    email: 'aenderb@hotmail.com',
-  },
-})  
+// Logger de requisições (antes das rotas)
+app.use(requestLogger);
+
+app.use(routes);
+
+// Logger de erros (antes do error handler)
+app.use(errorLogger);
+
+// Middleware global de tratamento de erros
+app.use(errorHandler);
+
