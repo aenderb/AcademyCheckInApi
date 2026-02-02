@@ -2,3 +2,6 @@ node_modules
 build
 /generated/prisma
 logs/
+coverage/
+*.log
+.env
