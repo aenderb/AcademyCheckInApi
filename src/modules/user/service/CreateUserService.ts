@@ -18,7 +18,7 @@ export class CreateUserService {
     }
 
     // Hash da senha
-    const salt = await genSalt(6);
+    const salt = await genSalt(10);
     const password_hash = await hash(password, salt);
 
     // Criar o usuário
