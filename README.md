@@ -1,5 +1,7 @@
 # 🏋️ Academy Check-In API
 
+> 🚧 **Work in Progress** - This project is under active development
+
 RESTful API for managing gym check-ins, built with **SOLID principles** and **enterprise-grade architecture**. This API provides a complete authentication and user management system with professional logging, error handling, and monitoring.
 
 ## ✨ Features Implemented
@@ -36,6 +38,20 @@ RESTful API for managing gym check-ins, built with **SOLID principles** and **en
 - ✅ Structured JSON logs
 - ✅ Migration-ready for Elasticsearch
 
+### 🛡️ Security & Rate Limiting
+- ✅ Rate limiting with express-rate-limit
+- ✅ Different limits per endpoint (signup, signin, general)
+- ✅ DDoS protection
+- ✅ Brute force attack prevention
+- ✅ Environment-based rate limits (dev vs prod)
+
+### 🧪 Testing
+- ✅ Vitest for unit testing
+- ✅ In-Memory Repository pattern
+- ✅ Test coverage reports (v8)
+- ✅ Vitest UI for visual test management
+- ✅ 100% coverage on CreateUserService
+
 ## 🛠️ Tech Stack
 
 ### Core
@@ -53,6 +69,14 @@ RESTful API for managing gym check-ins, built with **SOLID principles** and **en
 ### Logging & Monitoring
 - **Winston** - Professional logging
 - **express-winston** - HTTP request logging
+
+### Security
+- **express-rate-limit** - API rate limiting
+
+### Testing
+- **Vitest** - Fast unit testing framework
+- **@vitest/coverage-v8** - Code coverage reports
+- **@vitest/ui** - Visual test management
 
 ### Development
 - **tsx** - TypeScript execution
@@ -143,6 +167,8 @@ Content-Type: application/json
 }
 ```
 
+**Rate Limit:** 3 accounts per hour (dev: 100)
+
 **Response (201):**
 ```json
 {
@@ -165,6 +191,8 @@ Content-Type: application/json
   "password": "securePassword123"
 }
 ```
+
+**Rate Limit:** 5 attempts per 15 minutes (dev: 100)
 
 **Response (200):**
 ```json
@@ -217,7 +245,8 @@ src/
 │       │   └── GetUserByIdService.ts
 │       ├── repository/             # Data access
 │       │   ├── IUserRepository.ts
-│       │   └── PrismaUserRepository.ts
+│       │   ├── PrismaUserRepository.ts
+│       │   └── InMemoryUserRepository.ts  # For testing
 │       ├── dto/                    # Data Transfer Objects
 │       │   ├── CreateUserDTO.ts
 │       │   └── AuthenticateUserDTO.ts
@@ -236,7 +265,8 @@ src/
     │   └── index.ts
     ├── middlewares/
     │   ├── errorHandler.ts         # Global error handler
-    │   └── logger.ts               # Request/error logger
+    │   ├── logger.ts               # Request/error logger
+    │   └── rateLimiter.ts          # Rate limiting configs
     ├── utils/
     │   └── httpStatus.ts           # HTTP status constants
     └── infra/
@@ -267,14 +297,16 @@ npm run build
 # Start production server
 npm start
 
-# Run Prisma Studio (DB viewer)
-npx prisma studio
+# Testing
+npm test              # Run tests
+npm run test:watch    # Watch mode
+npm run test:coverage # Coverage report
+npm run test:ui       # Visual test UI
 
-# Create migration
-npx prisma migrate dev --name migration_name
-
-# Generate Prisma Client
-npx prisma generate
+# Database
+npx prisma studio     # DB viewer
+npx prisma migrate dev --name migration_name  # Create migration
+npx prisma generate   # Generate Prisma Client
 ```
 
 ## 🔒 Security Best Practices
@@ -284,10 +316,19 @@ npx prisma generate
 - ✅ Environment variables validation
 - ✅ Input validation with Zod
 - ✅ SQL injection prevention (Prisma ORM)
-- ⚠️ **TODO**: Add rate limiting
+- ✅ **Rate limiting implemented** (DDoS, brute force protection)
+- ✅ Environment-based rate limits (dev/prod)
 - ⚠️ **TODO**: Add CORS configuration
 - ⚠️ **TODO**: Add Helmet.js for security headers
 - ⚠️ **TODO**: Increase bcrypt salt to 10 in production
+
+### Rate Limiting Configuration
+
+| Endpoint | Production Limit | Development Limit |
+|----------|------------------|-------------------|
+| General (all routes) | 100 req/15min | 1000 req/15min |
+| POST /users/signin | 5 attempts/15min | 100 attempts/15min |
+| POST /users/signup | 3 accounts/hour | 100 accounts/hour |
 
 ## 📊 Logging
 
@@ -301,10 +342,39 @@ Logs are in JSON format for easy parsing and can be migrated to Elasticsearch. S
 
 ## 🧪 Testing
 
+### Run Tests
 ```bash
-# Coming soon
+# Run all tests
 npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage report
+npm run test:coverage
+
+# Visual UI
+npm run test:ui
 ```
+
+### Test Coverage
+Current coverage: **47.61%** (CreateUserService: 100%)
+
+```
+----------------------------|---------|----------|---------|---------|
+File                        | % Stmts | % Branch | % Funcs | % Lines |
+----------------------------|---------|----------|---------|---------|
+CreateUserService.ts        |     100 |      100 |     100 |     100 |
+InMemoryUserRepository.ts   |   53.84 |       50 |   66.66 |   54.54 |
+----------------------------|---------|----------|---------|---------|
+```
+
+### Testing Strategy
+- **In-Memory Repository** - Fast, isolated tests without database
+- **Unit Tests** - Service layer logic validation
+- **100% Coverage Goal** - All critical business logic covered
+
+Coverage reports: `coverage/index.html`
 
 ## 🚀 Deployment
 
@@ -314,12 +384,13 @@ npm test
 - [ ] Set `NODE_ENV=production`
 - [ ] Configure production `DATABASE_URL`
 - [ ] Increase bcrypt salt to 10
-- [ ] Add rate limiting
+- [x] Add rate limiting ✅
 - [ ] Configure CORS
 - [ ] Add Helmet.js
 - [ ] Set up log rotation
 - [ ] Configure monitoring (Sentry, New Relic)
 - [ ] Run migrations: `npx prisma migrate deploy`
+- [ ] Review rate limit values for production
 
 ## 📈 Roadmap
 
@@ -336,13 +407,14 @@ npm test
 - [ ] API documentation (Swagger)
 
 ### Future Improvements
-- [ ] Unit tests (Jest)
-- [ ] Integration tests
-- [ ] CI/CD pipeline
+- [x] Unit tests (Vitest) ✅
+- [ ] Integration tests (E2E)
+- [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Redis caching
 - [ ] DI Container (tsyringe)
 - [ ] GraphQL API
 - [ ] WebSocket notifications
+- [ ] Increase test coverage to 80%+
 
 ## 🤝 Contributing
 
@@ -463,31 +535,11 @@ AcademyCheckInApi/
 └── package.json         # Dependencies and scripts
 ```
 
-## 🔒 Security
 
-- Passwords are stored with secure hashing
-- Input data validation with Zod
-- Environment variables for sensitive data
-- UUID for unique identifiers
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-
-1. Fork the project
-2. Create a branch for your feature (`git checkout -b feature/MyFeature`)
-3. Commit your changes (`git commit -m 'Add MyFeature'`)
-4. Push to the branch (`git push origin feature/MyFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is under the ISC license.
 
 ## 👨‍💻 Author
-
 Developed by Aender Binoto
 
 ---
 
-⭐ Se este projeto foi útil para você, considere dar uma estrela!
+⭐ If this project was helpful to you, consider giving it a star!
