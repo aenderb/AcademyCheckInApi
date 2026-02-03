@@ -18,6 +18,7 @@ RESTful API for managing gym check-ins, built with **SOLID principles** and **en
 - ✅ Authenticate user (POST /users/signin)
 - ✅ Get user by ID (GET /users/:id)
 - ✅ Password hash hidden from responses
+- Test
 
 ### 🏗️ Architecture & Best Practices
 - ✅ **SOLID principles** implementation
